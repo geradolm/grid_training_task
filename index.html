@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Grid Training Task</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
+</head>
+
+<body>
+
+    <h1 class="title">First Grid</h1>
+
+    <div class="container">
+
+        <!-- Digital Clock -->
+
+        <div class="digital-clock" id="clockd">
+            <h1>Digital Clock</h1>
+            <div>
+                <p class="time">{{ time }}</p>
+            </div>
+        </div>
+
+        <!-- Login Session -->
+
+        <div class="login-session" id="login-form">
+            <div>
+                <h1>Log In Session</h1>
+                <form>
+                    <div>
+                        <label><b>Username</b></label>
+                        <input v-model="username" type="text" placeholder="Username" required />
+                        <label><b>Password</b></label>
+                        <input v-model="password" type="password" placeholder="Password" required />
+                        <div><button class="loginbtn" v-on:click.prevent=" login()" type="submit">Login</button></div>
+                        <p><button v-if="doLogin">Log in successfull.! </button><br><button v-if="doError">Incorrect
+                                User or Password</button><br><button v-if="missing">Please fill out the fields</button>
+                        </p>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Quiz -->
+
+        <div class="quiz" id="quiz">
+            <h1>Quiz</h1>
+            <div v-for="(question, index) in quiz.questions">
+                <div v-show="index === questionIndex">
+                    <h2>{{ question.text }}</h2>
+                    <ol>
+                        <li class="answer-option" v-for="response in question.responses">
+                            <label>
+                                <input type="radio" v-bind:value="response.correct" v-bind:name="index"
+                                    v-model="userResponses[index]"> {{response.text}}
+                            </label>
+                        </li>
+                    </ol>
+                    <button v-on:click="next">next</button>
+                </div>
+            </div>
+
+            <div v-show="questionIndex === quiz.questions.length">
+                <h3>Quiz finished<p>Total score: {{ score() }} / {{ quiz.questions.length }}</p>
+                    <p>{{ sound() }}</p>
+                </h3>
+            </div>
+        </div>
+
+        <!-- Table Data -->
+
+        <div class="table-data" id="table">
+            <h1>Table Data</h1>
+            <table class="tables">
+                <thead>
+                    <tr class="change-column">
+                        <th v-for="col in columns">{{col}}</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr class="remove-row" v-for="(row, index) in rows">
+                        <td v-for="col in columns">{{row[col]}}</td>
+                        <td> <i @click="removeRow(index)">Remove</i></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+
+        <!-- Submit Form -->
+
+        <div class="submit-form" id="adding">
+            <h1>Submit Form</h1>
+            <div class="form-group">
+                <label>Name</label>
+                <input type="text" class="form-name" v-model="newUser.name">
+            </div>
+            <div class="form-group">
+                <label>Last Name</label>
+                <input type="text" class="form-lastname" v-model="newUser.last_name">
+            </div>
+            <div class="form-group">
+                <label>Age</label>
+                <input type="number" min="1" max="100" class="form-age" v-model="newUser.age">
+            </div>
+            <button type="submit" class="btn btn-primary" @click="addUser()">Add</button>
+        </div>
+
+
+        <!-- Order List -->
+
+        <div class="order-form" id="order">
+            <h1>Order List</h1>
+            <form>
+                <div>
+                    <ol class="list-group">
+                        <br><br><br>
+                        <li class="list-group-item" v-for="product in products"
+                            v-bind:class="{ 'active': product.active }">
+                            <label class="list-products"><input type="checkbox" v-on:click="toggleActive(product)">
+                                {{ product.name }} - {{product.price}}</label>
+                        </li>
+                    </ol>
+                    <br><br>
+                    <div class="total">Total: {{ total()}}</div>
+                </div>
+            </form>
+        </div>
+
+        <!-- List Items Seacrh -->
+
+        <div class="search-list" id="searchlist">
+            <h1>Search</h1>
+            <div class="search">
+                <div>
+                    <input class="search-bar" type="search" id="searchGame" v-model="search"
+                        placeholder="Search Game" />
+                </div>
+                <ul class="list-search" v-for="game in filteredGames">
+                    <li><a><img :src="game.image">
+                            <p>{{ game.title }}</p>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- list & images -->
+
+        <div class="grid-list" id="toggle-grid-list">
+            <h1>Toggle Grid List</h1>
+            <div class="tool-bar">
+                <a class="list-icon" v-on:click="layout = 'list'" v-bind:class="{ 'active': layout == 'list'}"
+                    title="List"></a>
+                <a class="grid-icon" v-on:click="layout = 'grid'" v-bind:class="{ 'active': layout == 'grid'}"
+                    title="Grid"></a>
+            </div>
+
+            <ul v-if="layout === 'grid'" class="grid">
+                <li v-for="layouts in layout_list_grid">
+                    <a v-bind:style="{ backgroundImage: 'url(' + layouts.image.large + ')' }"></a>
+                </li>
+            </ul>
+
+            <ul v-if="layout === 'list'" class="list">
+                <li v-for="layouts in layout_list_grid">
+                    <a><img v-bind:src="layouts.image.small">
+                        <p>{{layouts.title}}</p>
+                    </a>
+                </li>
+            </ul>
+        </div>
+
+        <!-- Magig 8 Ball Game -->
+
+        <div class="magic-ball">
+            <h1>Magic 8 Ball Game</h1>
+            <div id="ball">
+                <div class="circle">
+                    <p>{{ answer }}</p>
+                </div>
+                <form class="question-box" @submit.prevent="getAnswer">
+                    <div class="question-game">
+                        <label>Ask: </label>
+                        <input v-model="question" />
+                    </div>
+                    <button type="submit">get answer</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+
+</html>
